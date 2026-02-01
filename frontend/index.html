@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Voice Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  
+      /* Attractive mesh background */
+      background:
+        radial-gradient(at 20% 20%, #fbc2eb, transparent 60%),
+        radial-gradient(at 80% 30%, #a6c1ee, transparent 60%),
+        radial-gradient(at 50% 80%, #fad0c4, transparent 60%),
+        #f5f5f5;
+    }
+  
+    .card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      width: 90%;
+      max-width: 600px;
+      padding: 32px;
+      border-radius: 20px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.18);
+    }
+  
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+  
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+  
+    input {
+      flex: 1;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      outline: none;
+      background: rgba(255,255,255,0.9);
+    }
+  
+    input:focus {
+      border-color: #ec4899;
+    }
+  
+    button {
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+  
+    .mic-btn {
+      background: #fce7f3;
+    }
+  
+    .mic-btn:hover {
+      background: #fbcfe8;
+    }
+  
+    .ask-btn {
+      background: linear-gradient(135deg, #ec4899, #f43f5e);
+      color: white;
+      width: 100%;
+      margin-top: 18px;
+    }
+  
+    .ask-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(244,63,94,0.3);
+    }
+  
+    #answer {
+      margin-top: 22px;
+      padding: 18px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 12px;
+      line-height: 1.6;
+      color: #333;
+    }
+  
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+      margin-top: 18px;
+    }
+  </style>
+  
+</head>
+
+<body>
+  <div class="card">
+    <h2>Ask Me Anything 🎙️</h2>
+
+    <div class="input-row">
+      <input
+        id="question"
+        placeholder="Type or speak your question..."
+      />
+      <button class="mic-btn" onclick="startVoice()">🎤</button>
+    </div>
+
+    <button class="ask-btn" onclick="ask()">Ask</button>
+
+    <div id="answer"></div>
+
+    <footer>
+      Powered by AI • Voice Enabled
+    </footer>
+  </div>
+
+  <script>
+    async function ask() {
+      const question = document.getElementById("question").value;
+      if (!question) return;
+
+      document.getElementById("answer").innerText = "Thinking...";
+
+      const res = await fetch("http://localhost:3000/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await res.json();
+      document.getElementById("answer").innerText = data.answer;
+    }
+
+    function startVoice() {
+      if (!("webkitSpeechRecognition" in window)) {
+        alert("Voice recognition not supported in this browser");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("question").value = transcript;
+        ask();
+      };
+
+      recognition.onerror = function () {
+        alert("Could not recognize voice. Try again.");
+      };
+    }
+  </script>
+</body>
+</html>
