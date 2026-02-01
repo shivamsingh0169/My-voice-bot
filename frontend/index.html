@@ -138,7 +138,7 @@
 
       document.getElementById("answer").innerText = "Thinking...";
 
-      const res = await fetch("http://localhost:3000/ask", {
+      const res = await fetch("https://my-voice-bot-1-k9v7.onrender.com/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question })
